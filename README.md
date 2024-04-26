@@ -1,89 +1,62 @@
-# croquet-GNN
-A deep learning project for Croquet using Graphical Neural Network
+# Croquet Shot Prediction using Graph Neural Networks
 
-Modeling a game like association rules croquet using a Graph Neural Network (GNN) involves several steps, primarily focusing on representing the game elements and interactions as a graph where nodes represent entities (like balls and hoops) and edges represent relationships or interactions (like ball hitting another or passing through a hoop). Here's a step-by-step approach to help you get started:
+This repository contains a Graph Neural Network (GNN) model designed to predict the success of shots in the game of croquet. The model utilizes PyTorch and PyTorch Geometric to process graph-based data representing the positions of balls and hoops, and the relationships between them.
 
-### 1. Define the Graph Structure
+## Project Overview
 
-First, you need to define what each node and edge in the graph represents. For a game like croquet:
+The purpose of this project is to apply Graph Neural Networks to predict whether a specific shot in croquet (starting from a baulk) will succeed. The model takes into account the positions of all balls and hoops at the start of the shot, represented as nodes in a graph, with potential shots represented as edges.
 
-- **Nodes** could represent the balls, players, hoops, and other game elements.
-- **Edges** could represent the interactions such as which ball can hit another, which ball goes through which hoop, distances between balls, etc.
+## Features
 
-### 2. Feature Representation
+- **Graph Representation**: Nodes represent croquet balls and hoops with features including positions and types.
+- **Edge Definition**: Edges define potential interactions such as shot attempts from a ball to a hoop.
+- **GNN Model**: The model predicts the probability of shot success using node features and the graph structure.
 
-Each node can have features. For example:
-- For balls: position, color, status (e.g., whether it has passed through all its hoops).
-- For players: score, number of turns taken, etc.
-- For hoops: position, whether it has been passed through by a particular ball.
+## Installation
 
-### 3. Define the Rules as Edge Relationships
+To set up the project environment to run the code, follow these steps:
 
-You can encode the rules of croquet as the interactions (edges) between nodes:
-- Possible moves from current positions.
-- Scoring based on interactions (e.g., a ball passing through a hoop).
+### Prerequisites
 
-### 4. Graph Neural Network Model
+- Python 3.8 or higher
+- pip
 
-You can use a GNN model to predict outcomes like the next best move or to simulate the progression of the game based on current states. The GNN can learn to embed complex relationships and rules of the game into its structure.
+### Libraries
 
-### 5. Implementation Using PyTorch and PyTorch Geometric
+Install the required Python libraries using pip:
 
-Here’s a basic example of how you might start implementing this in PyTorch using PyTorch Geometric, which is a library specifically for working with graph data in PyTorch:
-
-```python
-import torch
-from torch_geometric.data import Data
-from torch_geometric.nn import GCNConv
-
-# Example node features: [x_position, y_position, has_passed_hoop]
-node_features = torch.tensor([
-    [0, 0, 0],
-    [1, 2, 1],
-    [3, 1, 0]
-], dtype=torch.float)
-
-# Example edges: (node1, node2)
-edge_index = torch.tensor([
-    [0, 1],
-    [1, 2],
-    [2, 0]
-], dtype=torch.long).t().contiguous()
-
-# Create graph
-data = Data(x=node_features, edge_index=edge_index)
-
-class CroquetGNN(torch.nn.Module):
-    def __init__(self):
-        super(CroquetGNN, self).__init__()
-        self.conv1 = GCNConv(data.num_features, 16)
-        self.conv2 = GCNConv(16, 2)  # Assume 2 output features
-
-    def forward(self, x, edge_index):
-        x = self.conv1(x, edge_index)
-        x = torch.relu(x)
-        x = self.conv2(x, edge_index)
-        return x
-
-model = CroquetGNN()
-out = model(data.x, data.edge_index)
-print(out)
+```bash
+pip install torch torch-geometric
 ```
 
+## Usage
+
+To run the prediction model, execute the Python script `predict.py` which includes the model definition, data setup, and prediction logic:
+
+```bash
+python predict.py
 ```
-> python3 croquetgnn.py       
-tensor([[ 0.0505, -0.2955],
-        [ 0.0486, -0.1599],
-        [ 0.1135, -0.1635]], grad_fn=<AddBackward0>)
+
+The output will include the predicted probabilities of success for each potential shot from a ball to a hoop.
+
+## Contributing
+
+Contributions to this project are welcome! Here are some ways you can contribute:
+
+- **Improvements**: Suggest changes to the model or data representation.
+- **Features**: Add new features, such as the ability to simulate entire games.
+- **Bug Fixes**: Report and fix any bugs found in the existing code.
+
+Please open an issue to discuss your ideas or submit a pull request with your changes.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+If you have any questions or want to reach out to the project maintainers, please open an issue in this repository.
+
+Thank you for checking out our croquet shot prediction model!
 ```
 
-
-### 6. Training the Model
-
-To train the model, you'll need data generated from various game states and outcomes. Training could be supervised (predicting next moves from game states) or reinforcement learning (learning strategy by playing the game).
-
-### 7. Enhancements and Complexity
-
-As the model grows more complex, you might add more sophisticated features like player strategy, wind effects on ball movement, or probabilistic outcomes of hits.
-
-Graph Neural Networks are powerful in capturing complex relational data, making them suitable for applications like simulating games where interactions are key. If you're new to PyTorch Geometric, going through its documentation and tutorials will be very helpful.
